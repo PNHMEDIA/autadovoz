@@ -1,0 +1,1684 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Auto-dovoz.cz - Import aut z Německa a Švýcarska</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@200;300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'SF Pro Display', 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: #ffffff;
+            color: #1d1d1f;
+            overflow-x: hidden;
+            font-weight: 400;
+            line-height: 1.6;
+        }
+
+        /* Loader */
+        .loader {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            background: #ffffff;
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loader-logo {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #1d1d1f;
+            transform: translateY(100px);
+            opacity: 0;
+        }
+
+        /* Navigation */
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            z-index: 1000;
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            transition: all 0.3s ease;
+            border-bottom: 1px solid rgba(29, 29, 31, 0.1);
+        }
+
+        .nav-logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            letter-spacing: -0.02em;
+            color: #1d1d1f;
+        }
+
+        .nav-center {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-link {
+            color: #1d1d1f;
+            text-decoration: none;
+            font-size: 0.875rem;
+            font-weight: 500;
+            letter-spacing: -0.01em;
+            position: relative;
+            transition: all 0.3s ease;
+            padding: 0.5rem 0;
+        }
+
+        .nav-link:hover {
+            color: #007aff;
+        }
+
+        .nav-cta {
+            background: #007aff;
+            color: #ffffff;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            font-size: 0.875rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            border-radius: 20px;
+        }
+
+        .nav-cta:hover {
+            background: #0056cc;
+            transform: translateY(-1px);
+        }
+
+        /* Mobile Menu */
+        .mobile-menu-toggle {
+            display: none;
+            flex-direction: column;
+            cursor: pointer;
+            padding: 0.5rem;
+        }
+
+        .mobile-menu-toggle span {
+            width: 25px;
+            height: 2px;
+            background: #1d1d1f;
+            margin: 3px 0;
+            transition: 0.3s;
+        }
+
+        .mobile-menu {
+            position: fixed;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100vh;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            z-index: 999;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            transition: left 0.3s ease;
+        }
+
+        .mobile-menu.active {
+            left: 0;
+        }
+
+        .mobile-menu-link {
+            color: #1d1d1f;
+            text-decoration: none;
+            font-size: 1.5rem;
+            font-weight: 600;
+            letter-spacing: -0.02em;
+            margin: 1rem 0;
+            transition: all 0.3s ease;
+        }
+
+        .mobile-menu-link:hover {
+            color: #007aff;
+        }
+
+        /* Hero Section */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #f5f5f7 0%, #ffffff 100%);
+        }
+
+        .hero-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 4rem;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            width: 100%;
+        }
+
+        .hero-left {
+            z-index: 2;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(0, 122, 255, 0.1);
+            color: #007aff;
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            margin-bottom: 2rem;
+        }
+
+        .hero-title {
+            font-size: clamp(2.5rem, 6vw, 4rem);
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            color: #1d1d1f;
+            margin-bottom: 1.5rem;
+            line-height: 1.1;
+        }
+
+        .hero-description {
+            font-size: 1.25rem;
+            font-weight: 400;
+            color: #6e6e73;
+            margin-bottom: 3rem;
+            line-height: 1.5;
+            max-width: 500px;
+        }
+
+        .hero-buttons {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-btn-primary {
+            background: #007aff;
+            color: #ffffff;
+            padding: 1rem 2rem;
+            border: none;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            border-radius: 25px;
+        }
+
+        .hero-btn-primary:hover {
+            background: #0056cc;
+            transform: translateY(-2px);
+        }
+
+        .hero-btn-secondary {
+            background: transparent;
+            color: #1d1d1f;
+            padding: 1rem 2rem;
+            border: 2px solid #d2d2d7;
+            font-size: 1rem;
+            font-weight: 600;
+            letter-spacing: -0.01em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            border-radius: 25px;
+        }
+
+        .hero-btn-secondary:hover {
+            border-color: #007aff;
+            color: #007aff;
+        }
+
+        .hero-right {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .hero-image {
+            width: 100%;
+            height: 500px;
+            background: url('https://images.unsplash.com/photo-1542362567-b07e54358753?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80') no-repeat center center/cover;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Stats Section */
+        .stats-section {
+            padding: 4rem 2rem;
+            background: #ffffff;
+        }
+
+        .stats-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 3rem;
+            text-align: center;
+        }
+
+        .stat-item {
+            padding: 2rem;
+        }
+
+        .stat-number {
+            font-size: 3rem;
+            font-weight: 700;
+            color: #007aff;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .stat-label {
+            font-size: 1rem;
+            font-weight: 500;
+            color: #6e6e73;
+            letter-spacing: -0.01em;
+        }
+
+        /* Services Section */
+        .services-section {
+            padding: 6rem 2rem;
+            background: #f5f5f7;
+        }
+
+        .services-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .section-title {
+            font-size: clamp(2rem, 5vw, 3.5rem);
+            font-weight: 700;
+            color: #1d1d1f;
+            margin-bottom: 1rem;
+            letter-spacing: -0.025em;
+        }
+
+        .section-subtitle {
+            font-size: 1.25rem;
+            color: #6e6e73;
+            margin-bottom: 4rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .services-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .service-card {
+            background: #ffffff;
+            border-radius: 20px;
+            padding: 3rem 2rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            border: 1px solid #f0f0f0;
+        }
+
+        .service-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+        }
+
+        .service-icon {
+            width: 60px;
+            height: 60px;
+            background: #007aff;
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            font-weight: 700;
+            color: #ffffff;
+            font-size: 1.2rem;
+        }
+
+        .service-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #1d1d1f;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .service-description {
+            font-size: 1rem;
+            color: #6e6e73;
+            line-height: 1.6;
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 6rem 2rem;
+            background: #ffffff;
+        }
+
+        .features-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-top: 4rem;
+        }
+
+        .feature-item {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: linear-gradient(135deg, #007aff, #5856d6);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+        }
+
+        .feature-icon svg {
+            width: 40px;
+            height: 40px;
+            fill: #ffffff;
+        }
+
+        .feature-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1d1d1f;
+            margin-bottom: 1rem;
+            letter-spacing: -0.02em;
+        }
+
+        .feature-description {
+            font-size: 1rem;
+            color: #6e6e73;
+            line-height: 1.6;
+        }
+
+        /* Testimonials Section */
+        .testimonials-section {
+            position: relative;
+            height: 300vh;
+            background: #f5f5f7;
+            overflow: hidden;
+        }
+
+        .testimonials-container {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        .testimonials-timeline {
+            display: flex;
+            width: 400vw;
+            height: 100vh;
+            will-change: transform;
+        }
+
+        .testimonial-slide {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            padding: 4rem;
+            flex-shrink: 0;
+        }
+
+        .testimonial-content {
+            max-width: 800px;
+            text-align: center;
+            z-index: 2;
+        }
+
+        .testimonial-quote {
+            font-size: 1.5rem;
+            font-weight: 500;
+            color: #1d1d1f;
+            line-height: 1.5;
+            margin-bottom: 2rem;
+            font-style: italic;
+        }
+
+        .testimonial-author {
+            font-size: 1rem;
+            font-weight: 700;
+            color: #007aff;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .testimonial-role {
+            font-size: 0.875rem;
+            color: #6e6e73;
+            margin-top: 0.5rem;
+        }
+
+        /* Vehicle Showcase */
+        .vehicle-showcase {
+            position: relative;
+            height: 400vh;
+            background: #ffffff;
+        }
+
+        .vehicle-images-container {
+            position: sticky;
+            top: 0;
+            left: 0;
+            width: 60vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10;
+        }
+
+        .vehicle-image-wrapper {
+            position: relative;
+            width: 90%;
+            height: 80%;
+        }
+
+        .vehicle-showcase-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            opacity: 0;
+            transform: scale(0.95);
+            transition: all 1.5s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+            border-radius: 20px;
+            overflow: hidden;
+        }
+
+        .vehicle-showcase-image.active {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .vehicle-showcase-image.personal-bg {
+            background-image: url('https://images.unsplash.com/photo-1542362567-b07e54358753?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+        }
+
+        .vehicle-showcase-image.luxury-bg {
+            background-image: url('https://images.unsplash.com/photo-1555215695-3004980ad54e?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+        }
+
+        .vehicle-showcase-image.commercial-bg {
+            background-image: url('https://images.unsplash.com/photo-1601362840469-51e4d8d58785?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80');
+        }
+
+        .vehicle-content-container {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 40vw;
+            height: 400vh;
+            padding: 0 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+        }
+
+        .vehicle-content-section {
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            padding: 4rem 0;
+            max-width: 500px;
+        }
+
+        .section-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: #007aff;
+            margin-bottom: 2rem;
+        }
+
+        .showcase-title {
+            font-size: 3rem;
+            font-weight: 700;
+            letter-spacing: -0.025em;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+            color: #1d1d1f;
+        }
+
+        .showcase-description {
+            font-size: 1.125rem;
+            font-weight: 400;
+            line-height: 1.6;
+            margin-bottom: 2rem;
+            color: #6e6e73;
+        }
+
+        .showcase-features {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1rem;
+            margin: 2rem 0;
+        }
+
+        .showcase-feature {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1rem 0;
+        }
+
+        .showcase-feature svg {
+            width: 20px;
+            height: 20px;
+            fill: #007aff;
+            flex-shrink: 0;
+        }
+
+        .showcase-feature-text {
+            font-size: 1rem;
+            color: #1d1d1f;
+        }
+
+        .showcase-cta {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: #007aff;
+            color: #ffffff;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1rem;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            margin-top: 2rem;
+        }
+
+        .showcase-cta:hover {
+            background: #0056cc;
+            transform: translateY(-2px);
+        }
+
+        .showcase-cta svg {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        /* Contact Form Section */
+        .contact-form-section {
+            padding: 6rem 2rem;
+            background: #f5f5f7;
+        }
+
+        .form-container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: #ffffff;
+            padding: 3rem;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid #f0f0f0;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            display: block;
+            font-weight: 500;
+            color: #1d1d1f;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            letter-spacing: -0.01em;
+        }
+
+        .form-input,
+        .form-select,
+        .form-textarea {
+            width: 100%;
+            padding: 0.875rem 1rem;
+            border: 2px solid #e5e5e7;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            font-family: 'SF Pro Display', 'Inter', sans-serif;
+            background: #ffffff;
+        }
+
+        .form-input:focus,
+        .form-select:focus,
+        .form-textarea:focus {
+            outline: none;
+            border-color: #007aff;
+            box-shadow: 0 0 0 3px rgba(0, 122, 255, 0.1);
+        }
+
+        .form-textarea {
+            resize: vertical;
+            min-height: 120px;
+        }
+
+        .form-submit {
+            background: #007aff;
+            color: #ffffff;
+            padding: 1rem 3rem;
+            border: none;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            letter-spacing: -0.01em;
+        }
+
+        .form-submit:hover {
+            background: #0056cc;
+            transform: translateY(-2px);
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            padding: 6rem 2rem;
+            background: #ffffff;
+        }
+
+        .faq-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .faq-item {
+            background: #f5f5f7;
+            border-radius: 15px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            border: 1px solid #f0f0f0;
+        }
+
+        .faq-question {
+            width: 100%;
+            background: none;
+            border: none;
+            padding: 2rem;
+            text-align: left;
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: #1d1d1f;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            letter-spacing: -0.01em;
+        }
+
+        .faq-question:hover {
+            background: rgba(0, 122, 255, 0.05);
+        }
+
+        .faq-answer {
+            padding: 0 2rem 2rem;
+            font-size: 1rem;
+            color: #6e6e73;
+            line-height: 1.6;
+            display: none;
+        }
+
+        .faq-answer.active {
+            display: block;
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 6rem 2rem;
+            background: linear-gradient(135deg, #007aff 0%, #5856d6 100%);
+            text-align: center;
+        }
+
+        .cta-container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .cta-title {
+            font-size: clamp(2.5rem, 5vw, 4rem);
+            font-weight: 700;
+            color: #ffffff;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.025em;
+        }
+
+        .cta-description {
+            font-size: 1.25rem;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 3rem;
+            line-height: 1.5;
+        }
+
+        .cta-button {
+            background: #ffffff;
+            color: #007aff;
+            padding: 1.25rem 3rem;
+            border: none;
+            border-radius: 25px;
+            font-size: 1.125rem;
+            font-weight: 700;
+            letter-spacing: -0.01em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 20px 40px rgba(255, 255, 255, 0.2);
+        }
+
+        .cta-button svg {
+            width: 20px;
+            height: 20px;
+            fill: currentColor;
+        }
+
+        /* Footer */
+        .footer {
+            background: #1d1d1f;
+            color: #ffffff;
+            padding: 4rem 2rem 2rem;
+        }
+
+        .footer-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            margin-bottom: 3rem;
+        }
+
+        .footer-section h3 {
+            font-size: 1.25rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .footer-section p,
+        .footer-section a {
+            color: #a1a1a6;
+            text-decoration: none;
+            line-height: 1.8;
+            font-size: 0.95rem;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: #007aff;
+        }
+
+        .footer-bottom {
+            border-top: 1px solid #424245;
+            padding-top: 2rem;
+            text-align: center;
+            color: #a1a1a6;
+            font-size: 0.875rem;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .nav-center {
+                display: none;
+            }
+
+            .nav-cta {
+                display: none;
+            }
+
+            .mobile-menu-toggle {
+                display: flex;
+            }
+
+            .hero-content {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+                text-align: center;
+            }
+
+            .hero-buttons {
+                justify-content: center;
+            }
+
+            .hero-btn-primary,
+            .hero-btn-secondary {
+                width: 100%;
+                max-width: 300px;
+            }
+
+            .services-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .features-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .testimonial-slide {
+                padding: 2rem 1rem;
+            }
+
+            .testimonial-quote {
+                font-size: 1.25rem;
+            }
+
+            .vehicle-images-container {
+                width: 100%;
+                height: 50vh;
+            }
+
+            .vehicle-content-container {
+                width: 100%;
+                padding: 0 1rem;
+                top: 50vh;
+                height: 350vh;
+            }
+
+            .vehicle-content-section {
+                padding: 2rem 0;
+                max-width: 100%;
+            }
+
+            .showcase-title {
+                font-size: 2rem;
+            }
+
+            .stats-container {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 2rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .hero-title {
+                font-size: 2rem;
+            }
+
+            .hero-description {
+                font-size: 1.125rem;
+            }
+
+            .stats-container {
+                grid-template-columns: 1fr;
+            }
+
+            .stat-number {
+                font-size: 2.5rem;
+            }
+        }
+
+        .success-message {
+            display: none;
+            background: #34c759;
+            color: #ffffff;
+            padding: 1rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: 500;
+        }
+    </style>
+</head>
+<body>
+    <div class="loader" id="loader">
+        <div class="loader-logo">Auto-dovoz.cz</div>
+    </div>
+
+    <nav class="nav" id="nav">
+        <div class="nav-logo">Auto-dovoz.cz</div>
+        <div class="nav-center">
+            <a href="#services" class="nav-link">Služby</a>
+            <a href="#testimonials" class="nav-link">Reference</a>
+            <a href="#faq" class="nav-link">FAQ</a>
+            <a href="#contact" class="nav-link">Kontakt</a>
+        </div>
+        <a href="#cta" class="nav-cta">Nezávazná poptávka</a>
+        <div class="mobile-menu-toggle" id="mobileMenuToggle">
+            <span></span>
+            <span></span>
+            <span></span>
+        </div>
+    </nav>
+
+    <div class="mobile-menu" id="mobileMenu">
+        <a href="#services" class="mobile-menu-link">Služby</a>
+        <a href="#testimonials" class="mobile-menu-link">Reference</a>
+        <a href="#faq" class="mobile-menu-link">FAQ</a>
+        <a href="#contact" class="mobile-menu-link">Kontakt</a>
+    </div>
+
+    <section class="hero" id="hero">
+        <div class="hero-content">
+            <div class="hero-left">
+                <div class="hero-badge">
+                    <svg viewBox="0 0 24 24" width="16" height="16">
+                        <path fill="currentColor" d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                    </svg>
+                    15+ let zkušeností
+                </div>
+                <h1 class="hero-title">Váš sen na kolech přímo z Německa</h1>
+                <p class="hero-description">Profesionální import automobilů z Německa a Švýcarska. Najdeme pro vás ideální vozidlo, zajistíme celý proces nákupu a dovozu včetně všech formalit.</p>
+                <div class="hero-buttons">
+                    <a href="#contact" class="hero-btn-primary">Vyhledat vozidlo</a>
+                    <a href="#services" class="hero-btn-secondary">Jak to funguje</a>
+                </div>
+            </div>
+            <div class="hero-right">
+                <div class="hero-image"></div>
+            </div>
+        </div>
+    </section>
+
+    <section class="stats-section">
+        <div class="stats-container">
+            <div class="stat-item">
+                <div class="stat-number">2009</div>
+                <div class="stat-label">V oboru od roku</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">500+</div>
+                <div class="stat-label">Dovezených vozidel</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">98%</div>
+                <div class="stat-label">Spokojených zákazníků</div>
+            </div>
+            <div class="stat-item">
+                <div class="stat-number">2-3</div>
+                <div class="stat-label">Týdny standardní doba</div>
+            </div>
+        </div>
+    </section>
+
+    <section class="services-section" id="services">
+        <div class="services-container">
+            <h2 class="section-title">Kompletní servis pro dovoz vašeho auta</h2>
+            <p class="section-subtitle">Od vyhledání ideálního vozidla po předání klíčů. Postaráme se o vše, abyste si mohli užívat svůj nový automobil.</p>
+            <div class="services-grid">
+                <div class="service-card">
+                    <div class="service-icon">1</div>
+                    <h3 class="service-title">Vyhledávání vozidel</h3>
+                    <p class="service-description">Najdeme pro vás ideální automobil podle vašich požadavků z ověřených německých a švýcarských autobazarů.</p>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">2</div>
+                    <h3 class="service-title">Technická kontrola</h3>
+                    <p class="service-description">Každé vozidlo prochází důkladnou technickou kontrolou našimi odborníky přímo na místě před nákupem.</p>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">3</div>
+                    <h3 class="service-title">Vyjednání ceny</h3>
+                    <p class="service-description">Vyjednáme pro vás nejlepší možnou cenu a podmínky nákupu díky našim dlouhodobým kontaktům.</p>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">4</div>
+                    <h3 class="service-title">Transport a dovoz</h3>
+                    <p class="service-description">Zajistíme bezpečný transport vozidla na profesionálních autopřepravnících přímo k vám.</p>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">5</div>
+                    <h3 class="service-title">Vyřízení dokladů</h3>
+                    <p class="service-description">Kompletně vyřídíme všechny potřebné doklady, colní řízení a registraci na české úřady.</p>
+                </div>
+                
+                <div class="service-card">
+                    <div class="service-icon">6</div>
+                    <h3 class="service-title">Předání vozidla</h3>
+                    <p class="service-description">Předáme vám kompletně připravené vozidlo s českými doklady a technickou kontrolou.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="features-section">
+        <div class="features-container">
+            <h2 class="section-title">Proč si vybrat Auto-dovoz.cz?</h2>
+            <div class="features-grid">
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Transparentní ceny</h3>
+                    <p class="feature-description">Žádné skryté poplatky. Všechny náklady máte jasně specifikované dopředu.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zM12 20c-4.42 0-8-3.58-8-8s3.58-8 8-8 8 3.58 8 8-3.58 8-8 8z"/>
+                            <path d="M12.5 7H11v6l5.25 3.15.75-1.23-4.5-2.67z"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Rychlý process</h3>
+                    <p class="feature-description">Standardní doba dovozu je 2-3 týdny od výběru vozidla.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Ověření prodejci</h3>
+                    <p class="feature-description">Pracujeme pouze s ověřenými a důvěryhodnými prodejci vozidel.</p>
+                </div>
+                <div class="feature-item">
+                    <div class="feature-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                        </svg>
+                    </div>
+                    <h3 class="feature-title">Garance kvality</h3>
+                    <p class="feature-description">Poskytujeme záruku na všechny dovezené automobily a kompletní servis.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="testimonials-section" id="testimonials">
+        <div class="testimonials-container">
+            <div class="testimonials-timeline" id="testimonials-timeline">
+                <div class="testimonial-slide">
+                    <div class="testimonial-content">
+                        <p class="testimonial-quote">"Skvělá komunikace po celou dobu procesu. Auto bylo přesně takové, jak bylo popsáno, a za cenu, kterou jsme nikde jinde v ČR nenašli. Rozhodně doporučuji."</p>
+                        <div class="testimonial-author">Pavel Novák</div>
+                        <div class="testimonial-role">BMW X5, dovoz 2024</div>
+                    </div>
+                </div>
+                <div class="testimonial-slide">
+                    <div class="testimonial-content">
+                        <p class="testimonial-quote">"Profesionální přístup od začátku do konce. Vyřídili vše včetně financování a pojištění. Celý proces trval jen 3 týdny a já mám své vysněné auto."</p>
+                        <div class="testimonial-author">Jana Svobodová</div>
+                        <div class="testimonial-role">Audi A6, dovoz 2024</div>
+                    </div>
+                </div>
+                <div class="testimonial-slide">
+                    <div class="testimonial-content">
+                        <p class="testimonial-quote">"Ušetřil jsem více než 200 000 Kč oproti českým cenám za stejné vozidlo. Servis byl perfektní a auto je v naprosto bezvadném stavu."</p>
+                        <div class="testimonial-author">Tomáš Procházka</div>
+                        <div class="testimonial-role">Mercedes C-Class, dovoz 2023</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="vehicle-showcase" id="vehicles">
+        <div class="vehicle-images-container">
+            <div class="vehicle-image-wrapper">
+                <div class="vehicle-showcase-image personal-bg active" id="showcase-personal"></div>
+                <div class="vehicle-showcase-image luxury-bg" id="showcase-luxury"></div>
+                <div class="vehicle-showcase-image commercial-bg" id="showcase-commercial"></div>
+            </div>
+        </div>
+        <div class="vehicle-content-container">
+            <div class="vehicle-content-section">
+                <div class="section-label">01 / Osobní vozidla</div>
+                <h2 class="showcase-title">Osobní automobily</h2>
+                <p class="showcase-description">Široká nabídka osobních vozidel všех značek a kategorií. Od malých městských aut po prostorné rodinné vozy a SUV.</p>
+                <div class="showcase-features">
+                    <div class="showcase-feature">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        <span class="showcase-feature-text">Všechny značky a modely</span>
+                    </div>
+                    <div class="showcase-feature">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        <span class="showcase-feature-text">Nízké najeté kilometry</span>
+                    </div>
+                    <div class="showcase-feature">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        <span class="showcase-feature-text">Servisní historie k dispozici</span>
+                    </div>
+                </div>
+                <a href="#contact" class="showcase-cta">
+                    Vyhledat vozidlo
+                    <svg viewBox="0 0 24 24">
+                        <path d="M8.59 16.34l4.58-4.59-4.58-4.59L10 5.75l6 6-6 6z"/>
+                    </svg>
+                </a>
+            </div>
+            <div class="vehicle-content-section">
+                <div class="section-label">02 / Luxusní vozidla</div>
+                <h2 class="showcase-title">Prémiové a luxusní automobily</h2>
+                <p class="showcase-description">Specializujeme se na dovoz prémiových značek a luxusních vozidel s kompletní servisní historií a zárukou kvality.</p>
+                <div class="showcase-features">
+                    <div class="showcase-feature">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        <span class="showcase-feature-text">BMW, Mercedes, Audi, Porsche</span>
+                    </div>
+                    <div class="showcase-feature">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        <span class="showcase-feature-text">Plná servisní historie</span>
+                    </div>
+                    <div class="showcase-feature">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        <span class="showcase-feature-text">Prémiová výbava</span>
+                    </div>
+                </div>
+                <a href="#contact" class="showcase-cta">
+                    Vyhledat vozidlo
+                    <svg viewBox="0 0 24 24">
+                        <path d="M8.59 16.34l4.58-4.59-4.58-4.59L10 5.75l6 6-6 6z"/>
+                    </svg>
+                </a>
+            </div>
+            <div class="vehicle-content-section">
+                <div class="section-label">03 / Užitková vozidla</div>
+                <h2 class="showcase-title">Užitková a nákladní vozidla</h2>
+                <p class="showcase-description">Dovoz užitkových vozidel pro podnikatele a firmy. Dodávky, pickupy a malá nákladní vozidla všех kategorií.</p>
+                <div class="showcase-features">
+                    <div class="showcase-feature">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        <span class="showcase-feature-text">Dodávky a pickupy</span>
+                    </div>
+                    <div class="showcase-feature">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        <span class="showcase-feature-text">Všechny hmotnostní kategorie</span>
+                    </div>
+                    <div class="showcase-feature">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                        </svg>
+                        <span class="showcase-feature-text">Speciální úpravy na míru</span>
+                    </div>
+                </div>
+                <a href="#contact" class="showcase-cta">
+                    Vyhledat vozidlo
+                    <svg viewBox="0 0 24 24">
+                        <path d="M8.59 16.34l4.58-4.59-4.58-4.59L10 5.75l6 6-6 6z"/>
+                    </svg>
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <section class="contact-form-section" id="contact">
+        <div class="services-container">
+            <h2 class="section-title">Nezávazná poptávka</h2>
+            <p class="section-subtitle">Vyplňte formulář a my vám připravíme nabídku vozidel přesně na míru vašim požadavkům</p>
+            
+            <div class="form-container">
+                <div class="success-message" id="success-message">
+                    Děkujeme! Vaše poptávka byla odeslána. Ozveme se vám do 24 hodin.
+                </div>
+                
+                <form id="contact-form-element">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Jméno a příjmení *</label>
+                            <input type="text" class="form-input" name="name" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">E-mail *</label>
+                            <input type="email" class="form-input" name="email" required>
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Telefon *</label>
+                            <input type="tel" class="form-input" name="phone" required>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Město</label>
+                            <input type="text" class="form-input" name="city">
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Typ vozidla</label>
+                            <select class="form-select" name="vehicle-type">
+                                <option value="">Vyberte typ vozidla</option>
+                                <option value="osobni">Osobní automobil</option>
+                                <option value="suv">SUV / Crossover</option>
+                                <option value="kombi">Kombi</option>
+                                <option value="luxusni">Luxusní vozidlo</option>
+                                <option value="sportovni">Sportovní vůz</option>
+                                <option value="uzitkove">Užitkové vozidlo</option>
+                                <option value="elektromobil">Elektromobil</option>
+                                <option value="hybrid">Hybrid</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Rozpočet</label>
+                            <select class="form-select" name="budget">
+                                <option value="">Vyberte rozpočet</option>
+                                <option value="do-500k">Do 500 000 Kč</option>
+                                <option value="500k-1m">500 000 - 1 000 000 Kč</option>
+                                <option value="1m-2m">1 - 2 miliony Kč</option>
+                                <option value="nad-2m">Nad 2 miliony Kč</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label class="form-label">Preferovaná značka</label>
+                            <input type="text" class="form-input" name="brand" placeholder="BMW, Audi, Mercedes...">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Maximální stáří</label>
+                            <select class="form-select" name="max-age">
+                                <option value="">Bez omezení</option>
+                                <option value="1">Do 1 roku</option>
+                                <option value="3">Do 3 let</option>
+                                <option value="5">Do 5 let</option>
+                                <option value="10">Do 10 let</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label">Další požadavky</label>
+                        <textarea class="form-textarea" name="requirements" placeholder="Popište vaše specifické požadavky, preferovanou barvu, výbavu, maximální najeté kilometry..."></textarea>
+                    </div>
+                    
+                    <button type="submit" class="form-submit">Odeslat nezávaznou poptávku</button>
+                </form>
+            </div>
+        </div>
+    </section>
+
+    <section class="faq-section" id="faq">
+        <div class="faq-container">
+            <h2 class="section-title">Často kladené dotazy</h2>
+            <div class="faq-item">
+                <button class="faq-question">
+                    Kolik stojí dovoz automobilu z Německa?
+                    <span>+</span>
+                </button>
+                <div class="faq-answer">
+                    Náklady na dovoz se pohybují obvykle mezi 25 000 - 40 000 Kč v závislosti na typu vozidla, vzdálenosti a dalších faktorech. V ceně je zahrnuto vyhledání, kontrola, nákup, transport a vyřízení všech dokladů.
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    Jak dlouho trvá celý proces dovozu?
+                    <span>+</span>
+                </button>
+                <div class="faq-answer">
+                    Standardní doba dovozu je 2-3 týdny od okamžiku výběru konkrétního vozidla. Zahrnuje to vyjednání, nákup, transport a vyřízení všech českých dokladů včetně technické kontroly.
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    Poskytujete záruku na dovezená vozidla?
+                    <span>+</span>
+                </button>
+                <div class="faq-answer">
+                    Ano, poskytujeme záruku na všechna dovezená vozidla. Rozsah záruky závisí na stáří a typu vozidla. U novějších aut často přechází tovární záruka.
+                </div>
+            </div>
+            <div class="faq-item">
+                <button class="faq-question">
+                    Mohu si financovat nákup dovezeného vozidla?
+                    <span>+</span>
+                </button>
+                <div class="faq-answer">
+                    Ano, spolupracujeme s několika bankami a leasingovými společnostmi. Pomůžeme vám vyřídit financování na míru vašim možnostem a potřebám.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section" id="cta">
+        <div class="cta-container">
+            <h2 class="cta-title">Chcete ušetřit na novém autě?</h2>
+            <p class="cta-description">Kontaktujte nás ještě dnes a my vám najdeme to pravé vozidlo za nejlepší cenu přímo z Německa nebo Švýcarska.</p>
+            <a href="#contact" class="cta-button">
+                <svg viewBox="0 0 24 24">
+                    <path d="M20 4H4c-1.1 0-1.99.9-1.99 2L2 18c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zm0 4l-8 5-8-5V6l8 5 8-5v2z"/>
+                </svg>
+                Nezávazná poptávka
+            </a>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="footer-container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Auto-dovoz.cz</h3>
+                    <p>Specializujeme se na profesionální import automobilů z Německa a Švýcarska. Naším cílem je najít pro vás perfektní vozidlo za nejlepší cenu s komplexním servisem.</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Kontakt</h3>
+                    <p><a href="tel:+420777123456">+420 777 123 456</a></p>
+                    <p><a href="mailto:info@auto-dovoz.cz">info@auto-dovoz.cz</a></p>
+                    <p>Praha, Česká republika</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Otevírací doba</h3>
+                    <p>Pondělí - Pátek: 8:00 - 18:00</p>
+                    <p>Sobota: 9:00 - 15:00</p>
+                    <p>Neděle: Zavřeno</p>
+                </div>
+                <div class="footer-section">
+                    <h3>Služby</h3>
+                    <p><a href="#services">Import osobních vozidel</a></p>
+                    <p><a href="#services">Luxusní automobily</a></p>
+                    <p><a href="#services">Užitková vozidla</a></p>
+                    <p><a href="#contact">Nezávazná poptávka</a></p>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2025 Auto-dovoz.cz. Všechna práva vyhrazena.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Register GSAP plugins
+        gsap.registerPlugin(ScrollTrigger);
+
+        // Mobile Menu Toggle
+        const mobileMenuToggle = document.getElementById('mobileMenuToggle');
+        const mobileMenu = document.getElementById('mobileMenu');
+        const mobileMenuLinks = document.querySelectorAll('.mobile-menu-link');
+
+        mobileMenuToggle.addEventListener('click', () => {
+            mobileMenu.classList.toggle('active');
+            mobileMenuToggle.classList.toggle('active');
+            
+            const spans = mobileMenuToggle.querySelectorAll('span');
+            if (mobileMenu.classList.contains('active')) {
+                spans[0].style.transform = 'rotate(45deg) translate(5px, 5px)';
+                spans[1].style.opacity = '0';
+                spans[2].style.transform = 'rotate(-45deg) translate(7px, -6px)';
+            } else {
+                spans[0].style.transform = 'none';
+                spans[1].style.opacity = '1';
+                spans[2].style.transform = 'none';
+            }
+        });
+
+        mobileMenuLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                mobileMenu.classList.remove('active');
+                mobileMenuToggle.classList.remove('active');
+                
+                const spans = mobileMenuToggle.querySelectorAll('span');
+                spans[0].style.transform = 'none';
+                spans[1].style.opacity = '1';
+                spans[2].style.transform = 'none';
+            });
+        });
+
+        // Loader Animation
+        gsap.timeline()
+            .to(".loader-logo", { y: 0, opacity: 1, duration: 1.5, ease: "power3.out" })
+            .to(".loader", { y: "-100%", duration: 1, delay: 0.5, ease: "power3.inOut" })
+            .set(".loader", { display: "none" });
+
+        // Hero Animation
+        gsap.from(".hero-badge", { y: 50, opacity: 0, duration: 1, delay: 2.5, ease: "power3.out" });
+        gsap.from(".hero-title", { y: 100, opacity: 0, duration: 1.2, delay: 2.8, ease: "power3.out" });
+        gsap.from(".hero-description", { y: 80, opacity: 0, duration: 1, delay: 3.1, ease: "power3.out" });
+        gsap.from(".hero-buttons", { y: 60, opacity: 0, duration: 1, delay: 3.4, ease: "power3.out" });
+        gsap.from(".hero-image", { x: 100, opacity: 0, duration: 1.2, delay: 3.2, ease: "power3.out" });
+
+        // Navigation Hide on Scroll
+        ScrollTrigger.create({
+            start: "100 top",
+            onUpdate: self => {
+                gsap.to(".nav", { y: self.direction === 1 ? -80 : 0, duration: 0.3 });
+            }
+        });
+
+        // Testimonials Timeline Horizontal Scroll
+        let testimonialsTimeline = gsap.timeline({
+            scrollTrigger: {
+                trigger: ".testimonials-section",
+                start: "top top",
+                end: "bottom bottom",
+                scrub: 1,
+                pin: ".testimonials-container",
+                anticipatePin: 1,
+                invalidateOnRefresh: true,
+            }
+        });
+        testimonialsTimeline.to(".testimonials-timeline", { x: "-66.67%", ease: "none" });
+
+        gsap.utils.toArray(".testimonial-slide").forEach(slide => {
+            gsap.from(slide.querySelector(".testimonial-content"), {
+                y: 100, opacity: 0, duration: 1,
+                scrollTrigger: {
+                    trigger: slide,
+                    containerAnimation: testimonialsTimeline,
+                    start: "left 80%",
+                    end: "left 50%",
+                    scrub: 1,
+                    invalidateOnRefresh: true,
+                }
+            });
+        });
+
+        // Vehicle Showcase Pinning Animation
+        let vehiclesTl = gsap.timeline({
+            scrollTrigger: {
+                trigger: ".vehicle-showcase",
+                start: "top top",
+                end: "bottom bottom",
+                scrub: 1,
+                pin: ".vehicle-images-container",
+                anticipatePin: 1,
+                invalidateOnRefresh: true,
+                onUpdate: self => {
+                    const progress = self.progress;
+                    const images = document.querySelectorAll('.vehicle-showcase-image');
+                    images.forEach(img => img.classList.remove('active'));
+                    if (progress < 0.33) {
+                        document.getElementById('showcase-personal').classList.add('active');
+                    } else if (progress < 0.66) {
+                        document.getElementById('showcase-luxury').classList.add('active');
+                    } else {
+                        document.getElementById('showcase-commercial').classList.add('active');
+                    }
+                }
+            }
+        });
+
+        // Animate sections on scroll
+        gsap.utils.toArray('.service-card').forEach(card => {
+            gsap.from(card, {
+                y: 80,
+                opacity: 0,
+                duration: 0.8,
+                scrollTrigger: {
+                    trigger: card,
+                    start: "top 80%",
+                    end: "bottom 20%",
+                    toggleActions: "play none none reverse"
+                }
+            });
+        });
+
+        gsap.utils.toArray('.feature-item').forEach(item => {
+            gsap.from(item, {
+                y: 60,
+                opacity: 0,
+                duration: 0.8,
+                scrollTrigger: {
+                    trigger: item,
+                    start: "top 80%",
+                    end: "bottom 20%",
+                    toggleActions: "play none none reverse"
+                }
+            });
+        });
+
+        // FAQ Accordion
+        document.querySelectorAll('.faq-question').forEach(question => {
+            question.addEventListener('click', () => {
+                const answer = question.nextElementSibling;
+                const isActive = answer.classList.contains('active');
+                
+                // Close all answers
+                document.querySelectorAll('.faq-answer').forEach(ans => {
+                    ans.classList.remove('active');
+                });
+                document.querySelectorAll('.faq-question span').forEach(span => {
+                    span.textContent = '+';
+                });
+                
+                // Open clicked answer if it wasn't active
+                if (!isActive) {
+                    answer.classList.add('active');
+                    question.querySelector('span').textContent = '-';
+                }
+            });
+        });
+
+        // Form submission
+        document.getElementById('contact-form-element').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            const successMessage = document.getElementById('success-message');
+            successMessage.style.display = 'block';
+            this.reset();
+            
+            // Scroll to success message
+            successMessage.scrollIntoView({ behavior: 'smooth' });
+            
+            // Hide success message after 5 seconds
+            setTimeout(() => {
+                successMessage.style.display = 'none';
+            }, 5000);
+        });
+
+        // Smooth scrolling for navigation links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // ScrollTrigger refresh on resize
+        let resizeTimer;
+        window.addEventListener('resize', () => {
+            clearTimeout(resizeTimer);
+            resizeTimer = setTimeout(() => {
+                ScrollTrigger.refresh();
+            }, 250);
+        });
+
+        window.addEventListener('orientationchange', () => {
+            setTimeout(() => {
+                ScrollTrigger.refresh();
+            }, 500);
+        });
+    </script>
+</body>
+</html>
